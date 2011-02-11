@@ -39,8 +39,9 @@ def check_settings(request):
         #Converter
         {'name':'CONVERTER_CONVERT_PATH', 'value':converter_settings.CONVERT_PATH, 'exists':True},
         {'name':'CONVERTER_OCR_OPTIONS', 'value':converter_settings.OCR_OPTIONS},
+        {'name':'CONVERTER_UNOCONV_PATH_PATH', 'value':converter_settings.UNOCONV_PATH, 'exists':True},
 
-        #ocr
+        #OCR
         {'name':'OCR_TESSERACT_PATH', 'value':ocr_settings.TESSERACT_PATH, 'exists':True},
     ]
     

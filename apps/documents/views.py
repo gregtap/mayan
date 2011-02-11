@@ -353,14 +353,14 @@ def get_document_image(request, document_id, size=PREVIEW_SIZE):
     
     try:
         filepath = in_image_cache(document.checksum, size)
-   
         if filepath:
             return serve_file(request, File(file=open(filepath, 'r')))
+        
         #Save to a temporary location
         document.file.open()
         desc = document.file.storage.open(document.file.path)
         filepath = from_descriptor_to_tempfile(desc, document.checksum)
-        output_file = convert(filepath, size)
+        output_file = convert(filepath, size, mimetype=document.file_mimetype, extension=document.file_extension)
         return serve_file(request, File(file=open(output_file, 'r')))
     except Exception, e:
         if size == THUMBNAIL_SIZE:

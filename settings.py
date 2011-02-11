@@ -197,11 +197,17 @@ LOGIN_EXEMPT_URLS = (
 #DOCUMENTS_FILESYSTEM_SLUGIFY_PATHS = False
 #DOCUMENTS_FILESYSTEM_MAX_RENAME_COUNT = 200
 
-# Misc
-#DOCUMENTS_TEMPORARY_DIRECTORY = u'/tmp'
+# Converter
 #CONVERTER_CONVERT_PATH = u'/usr/bin/convert'
 #CONVERTER_OCR_OPTIONS = u'-colorspace Gray -depth 8 -resample 200x200'
+#CONVERTER_UNOCONV_PATH_PATH = u'/usr/bin/unoconv'
+
+# OCR
 #OCR_TESSERACT_PATH = u'/usr/bin/tesseract'
+
+# Misc
+#DOCUMENTS_TEMPORARY_DIRECTORY = u'/tmp'
+
 # Override
 SEARCH_SHOW_OBJECT_TYPE = False
 #======== End of configuration options =======
