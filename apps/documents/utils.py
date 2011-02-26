@@ -3,11 +3,12 @@ import tempfile
 from urllib import unquote_plus
 
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 
 
 from documents import TEMPORARY_DIRECTORY
 
-from models import DocumentMetadata, MetadataType
+from models import Document, DocumentMetadata, MetadataType
 
 #http://stackoverflow.com/questions/123198/how-do-i-copy-a-file-in-python
 def copyfile(source, dest, buffer_size=1024*1024):
@@ -49,7 +50,6 @@ def from_descriptor_to_tempfile(input_descriptor, filename, buffer_size=1024*102
     return path
 
 
-
 def from_descriptor_to_new_tempfile(input_descriptor, buffer_size=1024*1024):
     output_descriptor, tmp_filename = tempfile.mkstemp()
     
@@ -88,8 +88,17 @@ def decode_metadata_from_url(url_dict):
     
 def save_metadata_list(metadata_list, document):
     for item in metadata_list:
-        save_metadata(item, document)
-        
+        if item['value']:
+            save_metadata(item, document)
+        else:
+            try:
+                metadata_type = MetadataType.objects.get(id=item['id'])
+                document_metadata = DocumentMetadata.objects.get(document=document,
+                    metadata_type=metadata_type)
+                document_metadata.delete()
+            except ObjectDoesNotExist:
+                pass
+                        
         
 def save_metadata(metadata_dict, document):
     #Use matched metadata now to create document metadata
@@ -98,5 +107,8 @@ def save_metadata(metadata_dict, document):
         metadata_type=get_object_or_404(MetadataType, pk=metadata_dict['id']),
     )
     #Handle 'plus sign as space' in the url
-    document_metadata.value=unquote_plus(metadata_dict['value'])
-    document_metadata.save()        
+    
+    #unquote_plus handles utf-8?!?
+    #http://stackoverflow.com/questions/4382875/handling-iri-in-django
+    document_metadata.value=unquote_plus(metadata_dict['value'])#.decode('utf-8')
+    document_metadata.save()

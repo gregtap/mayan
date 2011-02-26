@@ -3,3 +3,43 @@
 * Show only document metadata in document list view.
 * If one document type exists, the create document wizard skips the first step.
 * Changed to a liquid css grid
+* Added the ability to group documents by their metadata
+* New abstracted options to adjust document conversion quality (default, low, high)
+* Added permissions and roles support
+* Added multipage documents support (only tested on pdfs)
+    To update a previous database do: [d.update_page_count() for d in Document.objects.all()]
+* Added support for document page transformation (no GUI yet)
+* Added views to create, edit and grant/revoke permissions to roles
+* Apply default transformations to document before OCR
+* Added unpaper to the OCR convertion pipe
+* Added support for concurrent, queued OCR processing using celery
+* Added sentry to monitor and store error for later debugging
+* Zip files can now be uncompressed in memory and their content uploaded individually in one step
+
+2011-Feb 21
+* Added per document duplicate search and a tools menu option to seach all duplicated documents
+* Added document tool that deletes and re-creates all documents filesystem links
+* Increased document's and document metadata index filename field's size to 255 characters
+
+2011-Feb 26
+* Added document description to the field search list
+* Sort OCR queued documents according to submitted date & time
+* Document filesystem serving is now a separate app
+    - Step to update:
+        1) rename the following settings:
+            DOCUMENTS_FILESYSTEM_FILESERVING_ENABLE
+            DOCUMENTS_FILESYSTEM_FILESERVING_PATH
+            DOCUMENTS_FILESYSTEM_SLUGIFY_PATHS
+            DOCUMENTS_FILESYSTEM_MAX_RENAME_COUNT
+        to:    
+            FILESYSTEM_FILESERVING_ENABLE
+            FILESYSTEM_FILESERVING_PATH
+            FILESYSTEM_SLUGIFY_PATHS
+            FILESYSTEM_MAX_RENAME_COUNT
+        
+        2) Do a ./manage.py syncdb
+        3) Execute 'Recreate index links' locate in the tools menu
+        4) Wait a few minutes
+        
+        Some warnings may be returned, but these are not fatal as they might 
+        be related to missing metadata in some documents.

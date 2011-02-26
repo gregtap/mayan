@@ -1,5 +1,8 @@
 import copy
 
+from django.db.utils import DatabaseError
+
+
 object_navigation = {}
 menu_links = []
 model_list_columns = {}

@@ -15,12 +15,10 @@ PROJECT_NAME = 'mayan'
 
 DEBUG = False
 DEVELOPMENT = False
-TEMPLATE_DEBUG = DEBUG
+TEMPLATE_DEBUG = True
 
-ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
-)
-
+ADMINS = ()
+SENTRY_ADMINS = ('root@localhost',)
 MANAGERS = ADMINS
 
 DATABASES = {
@@ -77,7 +75,7 @@ MEDIA_URL = '/%s-site_media/' % PROJECT_NAME
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = MEDIA_URL + 'admin_media/'
+ADMIN_MEDIA_PREFIX = MEDIA_URL + 'grappelli/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'om^a(i8^6&h+umbd2%pt91cj!qu_@oztw117rgxmn(n2lp^*c!'
@@ -126,6 +124,15 @@ INSTALLED_APPS = (
     'filetransfers',
     'converter',
     'ocr',
+    'permissions',
+    'djcelery',
+    'indexer',
+    'paging',
+    'sentry',
+    'sentry.client',
+    'sentry.client.celery',
+    'filesystem_serving',
+    
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -172,15 +179,19 @@ LOGIN_EXEMPT_URLS = (
 #DOCUMENTS_METADATA_AVAILABLE_MODELS = {}
 
 # Upload
-#DOCUMENTS_DELETE_LOCAL_ORIGINAL = False
 #DOCUMENTS_USE_STAGING_DIRECTORY = False
 #DOCUMENTS_STAGING_DIRECTORY = u'/tmp/mayan/staging'
 #DOCUMENTS_DELETE_STAGING_FILE_AFTER_UPLOAD = False
 #DOCUMENTS_STAGING_FILES_PREVIEW_SIZE = '640x480'
+#DOCUMENTS_AUTOMATIC_OCR = False
+#DOCUMENTS_ENABLE_SINGLE_DOCUMENT_UPLOAD = True
+#DOCUMENTS_UNCOMPRESS_COMPRESSED_LOCAL_FILES = True
+#DOCUMENTS_UNCOMPRESS_COMPRESSED_STAGING_FILES = True
 
 # Saving
 #DOCUMENTS_CHECKSUM_FUNCTION = lambda x: hashlib.sha256(x).hexdigest())
 #DOCUMENTS_UUID_FUNCTION = lambda:unicode(uuid.uuid4())
+#DOCUMENTS_DEFAULT_TRANSFORMATIONS = []
 
 # Storage
 #DOCUMENTS_STORAGE_DIRECTORY_NAME = 'documents'
@@ -189,27 +200,53 @@ LOGIN_EXEMPT_URLS = (
 # Usage
 #DOCUMENTS_PREVIEW_SIZE = '640x480'
 #DOCUMENTS_THUMBNAIL_SIZE = '50x50'
-#DOCUMENTS_DISPLAY_SIZE = '1024x768'
+#DOCUMENTS_DISPLAY_SIZE = '1200'
+#DOCUMENTS_MULTIPAGE_PREVIEW_SIZE = '160x120'
+#DOCUMENTS_AVAILABLE_TRANSFORMATIONS = {}
+#example: DOCUMENTS_DEFAULT_TRANSFORMATIONS = [{'name':'rotate', 'arguments':"{'degrees':270}"}]
+
+# Groups
+#DOCUMENTS_GROUP_MAX_RESULTS = 20
+#DOCUMENTS_GROUP_SHOW_EMPTY = True
 
 # Serving
-#DOCUMENTS_FILESYSTEM_FILESERVING_ENABLE = True
-#DOCUMENTS_FILESYSTEM_FILESERVING_PATH = u'/tmp/mayan/documents'
-#DOCUMENTS_FILESYSTEM_SLUGIFY_PATHS = False
-#DOCUMENTS_FILESYSTEM_MAX_RENAME_COUNT = 200
+#FILESYSTEM_FILESERVING_ENABLE = True
+#FILESYSTEM_FILESERVING_PATH = u'/tmp/mayan/documents'
+#FILESYSTEM_SLUGIFY_PATHS = False
+#FILESYSTEM_MAX_RENAME_COUNT = 200
+
+# Misc
+#COMMON_TEMPORARY_DIRECTORY = u'/tmp'
 
 # Converter
+#CONVERTER_DEFAULT_OPTIONS = u''
+#CONVERTER_LOW_QUALITY_OPTIONS = u''
+#CONVERTER_HIGH_QUALITY_OPTIONS =  u'-density 400'
 #CONVERTER_CONVERT_PATH = u'/usr/bin/convert'
 #CONVERTER_OCR_OPTIONS = u'-colorspace Gray -depth 8 -resample 200x200'
-#CONVERTER_UNOCONV_PATH_PATH = u'/usr/bin/unoconv'
+#CONVERTER_IDENTIFY_PATH = u'/usr/bin/identify'
+#CONVERTER_UNPAPER_PATH = u'/usr/bin/unpaper'
 
 # OCR
 #OCR_TESSERACT_PATH = u'/usr/bin/tesseract'
+#OCR_MAX_CONCURRENT_EXECUTION = 2
+#OCR_TESSERACT_LANGUAGE = None
 
-# Misc
-#DOCUMENTS_TEMPORARY_DIRECTORY = u'/tmp'
+
+# Permissions
+#ROLES_DEFAULT_ROLES = []
 
 # Override
 SEARCH_SHOW_OBJECT_TYPE = False
+#----------- django-celery --------------
+import djcelery
+djcelery.setup_loader()
+BROKER_HOST = "localhost"
+BROKER_PORT = 5672
+BROKER_USER = "guest"
+BROKER_PASSWORD = "guest"
+BROKER_VHOST = "/"
+CELERYBEAT_SCHEDULER='djcelery.schedulers.DatabaseScheduler'
 #======== End of configuration options =======
 
 try:
@@ -229,19 +266,22 @@ if DEVELOPMENT:
         import rosetta
         INSTALLED_APPS += ('rosetta',)
     except ImportError:
-        print 'rosetta is not installed'
+        #print 'rosetta is not installed'
+        pass
 
     try:
         import django_extensions
         INSTALLED_APPS +=('django_extensions',)
     except ImportError:
-        print 'django_extensions is not installed'
+        #print 'django_extensions is not installed'
+        pass
 
     try:
         import debug_toolbar
         #INSTALLED_APPS.append('debug_toolbar')
     except ImportError:
-        print 'debug_toolbar is not installed'
+        #print 'debug_toolbar is not installed'
+        pass
 
     TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.debug',)
 
@@ -251,4 +291,3 @@ if DEVELOPMENT:
         DEBUG_TOOLBAR_CONFIG={
             'INTERCEPT_REDIRECTS' : False,
         }
-

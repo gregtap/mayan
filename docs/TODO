@@ -1,3 +1,5 @@
+TODO, WISHLIST
+===========
 * Fix repeated search results                                          - DONE
 * File renaming dropdown                                               - DONE
 * Create indexing filesystem folders from document type metadata type  - DONE
@@ -24,38 +26,70 @@
 * Show document metadata in document list                              - DONE
 * Add css grids                                                        - DONE
 * If theres only one document type on db skip step 1 of wizard         - DONE
+* Be able to delete staging file                                       - DONE
+* Group documents by metadata                                          - DONE
+* Permissions                                                          - DONE
+* Roles                                                                - DONE
+* Assign default role to new users                                     - DONE
+* DB stored transformations                                            - DONE
+* Recognize multi-page documents                                       - DONE
+* Add unpaper to pre OCR document cleanup                              - DONE
+* Count pages in a PDF file http://pybrary.net/pyPdf/                  - NOT NEEDED
+* Support distributed OCR queues (RabbitMQ & Celery?)                  - DONE
+* MuliThreading deferred OCR                                           - DONE
+* Handle ziped or rar archives                                         - DONE (zip only)
+* Scheduled maintenance (cleanup, deferred OCR's)                      - DONE
+* Tesserat default option ocr setup                                    - DONE
+* Check duplicated files using checksum                                - DONE
+* Link to delete and recreate all document links                       - DONE
+* Change to model signals                                              - NOT NEEDED, found way to prevent save method recursion
+* Role editing view under setup                                        - STARTED
 * Document list filtering by metadata
 * Filterform date filtering widget
 * Validate GET data before saving file
-* Check duplicated files using checksum
 * Show last 5 recent metadata setups for easy switch
-* Change to model signals
 * Allow document type to be changed in document edit view
 * Encrypting storage backend
 * Indicate in generic list which document don't exist in storage backend
 * Document model's delete method might not get called when deleting in bulk
     from a queryset
 * Allow metadata entry form to mix required and non required metadata
-* Link to delete and recreate all document links
-* MuliThreading deferred OCR
 * Versioning support
 * Generic document anotations using layer overlays
-* Permissions
-* Roles
 * Workflows
-* Scheduled maintenance (cleanup, deferred OCR's)
 * Add tags to documents
 * Field for document language or autodetect
-* Recognize multi-page documents
-* Count pages in a PDF file http://pybrary.net/pyPdf/
 * Download a document in diffent formats: (jpg, png, pdf)
 * Cache.cleanup function to delete cached images when document hash changes
 * Divide navigation links search by object and by view
 * Add show_summary method to model to display as results of a search
-* Add unpaper to pre OCR document cleanup
-* Support distributed OCR queues (RabbitMQ & Celery?)
 * DXF viewer - http://code.google.com/p/dxf-reader/source/browse/#svn%2Ftrunk
-* Group documents by metadata
 * Support spreadsheets, wordprocessing docs using openoffice in server mode
 * WebDAV support
-* Handle ziped or rar archives
+* Display preferences 'document transformations' (Rotation, default zoom)
+* Document view temp transformations
+* Gallery view for document groups
+* Download metadata group documents as a single zip file
+* Download original document or transformed document
+* Include annotations in transformed documents downloads
+* Implement permissions decorators
+* Block Setup menu item to non staff and non superuser users
+* Don't append an extension separator if extension is non existant
+* Don't do OCR on wordproccessing or spreadsheet document, strip tags and store text
+* Storage backend to storage backend copy support, to move/migrate document to new storage backend
+* Do separate default transformations for staging and for local uploads
+* Multiple ocr queue support
+* Enable/disable ocr queue view & links
+* Restrict view permission free form rename
+* Add per node max ocr concurrent execution
+* Skip step 2 of wizard (metadata) if no document type metadata types have been defined
+* Add permissions support to menus
+* Add timeout support to ocr and convert tasks
+* Allow for OCR document requeue on error and requeue limit
+* Publish document option
+
+
+ISSUES
+===========
+* Staging file hash colition when same file with different name, newhash = content hash + filename hash
+* Fix search action for documents with no metadata
