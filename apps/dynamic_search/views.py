@@ -66,7 +66,7 @@ def search(request):
             query = get_query(terms, data['fields'])            
 
             try:
-                results = model.objects.filter(query)
+                results = model.objects.select_related().filter(query)
                 if results:
                     found_entries[data['text']] = results
                     for result in results:

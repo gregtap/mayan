@@ -769,3 +769,97 @@ def document_recreate_all_links(request):
             messages.error(request, _(u'Filesystem links re-creation error: %s') % e)
             
         return HttpResponseRedirect(next)
+        
+        
+def document_viewer(request, document_id):
+    permissions = [PERMISSION_DOCUMENT_VIEW]
+    try:
+        check_permissions(request.user, 'documents', permissions)
+    except Unauthorized, e:
+        raise Http404(e)
+            
+    document = get_object_or_404(Document, pk=document_id)
+    
+    """
+    form = DocumentForm_view(instance=document, extra_fields=[
+        {'label':_(u'Filename'), 'field':'file_filename'},
+        {'label':_(u'File extension'), 'field':'file_extension'},
+        {'label':_(u'File mimetype'), 'field':'file_mimetype'},
+        {'label':_(u'File mime encoding'), 'field':'file_mime_encoding'},
+        {'label':_(u'File size'), 'field':lambda x: pretty_size(x.file.storage.size(x.file.path)) if x.exists() else '-'},
+        {'label':_(u'Exists in storage'), 'field':'exists'},
+        {'label':_(u'Date added'), 'field':lambda x: x.date_added.date()},
+        {'label':_(u'Time added'), 'field':lambda x: unicode(x.date_added.time()).split('.')[0]},
+        {'label':_(u'Checksum'), 'field':'checksum'},
+        {'label':_(u'UUID'), 'field':'uuid'},
+        {'label':_(u'Pages'), 'field':lambda x: x.documentpage_set.count()},
+    ])
+    """
+        
+    metadata_groups, errors = document.get_metadata_groups()
+    if request.user.is_staff and errors:
+        for error in errors:
+            messages.warning(request, _(u'Metadata group query error: %s' % error))
+    """
+    preview_form = DocumentPreviewForm(document=document)
+    form_list = [
+        {
+            'form':form,
+            'object':document,
+            'grid':6,
+        },
+        {
+            'form':preview_form,
+            'title':_(u'document preview'),
+            'object':document,
+            'grid':6,
+            'grid_clear':True,
+        },
+    ]
+    subtemplates_dict = [
+            {
+                'name':'generic_list_subtemplate.html',
+                'title':_(u'metadata'),
+                'object_list':document.documentmetadata_set.all(),
+                'extra_columns':[{'name':_(u'value'), 'attribute':'value'}],
+                'hide_link':True,
+            },
+        ]
+    
+    if FILESYSTEM_FILESERVING_ENABLE:
+        subtemplates_dict.append({
+            'name':'generic_list_subtemplate.html',
+            'title':_(u'index links'),
+            'object_list':document.documentmetadataindex_set.all(),
+            'hide_link':True}) 
+    """
+    sidebar_groups = []
+    for group, data in metadata_groups.items():
+        if len(data) or GROUP_SHOW_EMPTY:
+            if len(data):
+                if len(data) > GROUP_MAX_RESULTS:
+                    total_string = '(%s out of %s)' % (GROUP_MAX_RESULTS, len(data))
+                else:
+                    total_string = '(%s)' % len(data)
+            else:
+                total_string = ''
+            sidebar_groups.append({
+                'title':'%s %s' % (group.label, total_string),
+                'name':'generic_list_subtemplate.html',
+                'object_list':data[:GROUP_MAX_RESULTS],
+                'hide_columns':True,
+                'hide_header':True,
+                'extra_columns':[
+                    {'name':'current','attribute':lambda x: '<span class="famfam active famfam-resultset_previous"></span>' if x == document else ''}
+                ],
+                })
+
+    return render_to_response('viewer.html', {
+        #'form_list':form_list,
+        'object':document,
+        'current_page_image_url':reverse('document_display', args=[document.id]),
+        'page_preview_image_url':reverse('document_preview_multipage', args=[document.id]),
+        'page_number':1,
+        #'subtemplates_dict':subtemplates_dict,
+        #'sidebar_subtemplates_dict':sidebar_groups,
+    }, context_instance=RequestContext(request))
